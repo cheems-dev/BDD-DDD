@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>pe.gob.cofopri</groupId>
-	<artifactId>cofopri-catastro-bdd</artifactId>
+	<artifactId>cofopri-titulacion-bdd</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<name>COFOPRI - Sistema de Catastro con DDD</name>
-	<description>Sistema de gestión catastral para COFOPRI usando Domain-Driven Design</description>
+	<name>COFOPRI - Sistema de Titulación BDD/DDD</name>
+	<description>Sistema de Titulación de Predios Urbanos - COFOPRI con metodología BDD y arquitectura DDD</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -36,6 +36,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -51,6 +52,12 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 
 		<!-- OpenAPI/Swagger -->
 		<dependency>
@@ -59,14 +66,13 @@
 			<version>2.6.0</version>
 		</dependency>
 
-		<!-- Lombok -->
+		<!-- Tools -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>${lombok.version}</version>
 			<optional>true</optional>
 		</dependency>
-
 		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
