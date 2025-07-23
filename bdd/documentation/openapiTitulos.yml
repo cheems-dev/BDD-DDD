@@ -1,0 +1,324 @@
+openapi: 3.0.3
+info:
+  title: 'COFOPRI - FEATURE: Gestión de Títulos'
+  description: >-
+    Feature: Como responsable de titulación necesito gestionar títulos de
+    propiedad para completar el proceso de formalización
+
+
+    Esta colección implementa pruebas BDD (Behavior-Driven Development)
+    siguiendo el patrón Given-When-Then para todos los escenarios de generación,
+    envío e inscripción de títulos de propiedad.
+  version: 1.0.0
+  contact: {}
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /api/titulos:
+    post:
+      summary: 'SCENARIO: Generar título para solicitud aprobada'
+      description: |-
+        **WHEN**: Envío POST /api/titulos para generar título de propiedad
+
+        **Comportamiento esperado:**
+        - Estado HTTP 201 Created
+        - ID de título generado
+        - Número de título único y secuencial
+        - Estado inicial 'GENERADO'
+        - Todos los campos requeridos presentes
+        - Asociación correcta con solicitud
+      operationId: scenarioGenerarTTuloParaSolicitudAprobada
+      requestBody:
+        content:
+          text/plain:
+            example: |-
+              {
+                "solicitudId": ,
+                "tipoTitulo": "",
+                "modalidadAdjudicacion": "",
+                "resolucionDirectoral": "",
+                "funcionarioResponsable": "",
+                "observaciones": "Título generado para proceso de titulación masiva COFOPRI 2024",
+                "configuracionTitulo": {
+                  "incluirPlanoUbicacion": true,
+                  "incluirFotografia": true,
+                  "incluirCaracteristicasPredio": true,
+                  "formatoSalida": "PDF_DIGITAL",
+                  "nivelSeguridad": "ALTO"
+                }
+              }
+      responses:
+        '200':
+          description: ''
+  /api/titulos/solicitud/{solicitud_aprobada_id}:
+    get:
+      summary: 'SCENARIO: Consultar título por solicitud'
+      description: >-
+        **WHEN**: Envío GET /api/titulos/solicitud/{solicitudId} para obtener
+        título asociado
+
+
+        **Comportamiento esperado:**
+
+        - Estado HTTP 200 OK
+
+        - Datos completos del título
+
+        - Asociación correcta con solicitud
+
+        - Estado válido del título
+
+        - Información completa del beneficiario
+      operationId: scenarioConsultarTTuloPorSolicitud
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: solicitud_aprobada_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/titulos/{titulo_id}/sunarp:
+    post:
+      summary: 'SCENARIO: Enviar título a SUNARP para inscripción'
+      description: >-
+        **WHEN**: Envío POST /api/titulos/{id}/sunarp para registrar título en
+        SUNARP
+
+
+        **Comportamiento esperado:**
+
+        - Estado HTTP 200 OK
+
+        - Estado actualizado a 'ENVIADO_SUNARP'
+
+        - ID de transacción SUNARP generado
+
+        - Timestamp de envío registrado
+
+        - Información de oficina registral
+
+        - Tiempo estimado de procesamiento
+      operationId: scenarioEnviarTTuloASunarpParaInscripciN
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentosAdjuntos:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      hash:
+                        type: string
+                        example: sha256:abcd1234567890...
+                      nombre:
+                        type: string
+                        example: titulo_propiedad_digital.pdf
+                      tipo:
+                        type: string
+                        example: TITULO_PROPIEDAD
+                  example:
+                    - hash: sha256:abcd1234567890...
+                      nombre: titulo_propiedad_digital.pdf
+                      tipo: TITULO_PROPIEDAD
+                    - hash: sha256:efgh0987654321...
+                      nombre: plano_ubicacion_georef.pdf
+                      tipo: PLANO_UBICACION
+                    - hash: sha256:ijkl5678901234...
+                      nombre: resolucion_directoral.pdf
+                      tipo: RESOLUCION_DIRECTORAL
+                funcionarioResponsable:
+                  type: string
+                  example: ''
+                observaciones:
+                  type: string
+                  example: Envío automático desde sistema COFOPRI - Proceso BDD
+                oficinaRegistral:
+                  type: string
+                  example: ''
+                prioridadTramite:
+                  type: string
+                  example: NORMAL
+                tipoInscripcion:
+                  type: string
+                  example: ''
+            example:
+              documentosAdjuntos:
+                - hash: sha256:abcd1234567890...
+                  nombre: titulo_propiedad_digital.pdf
+                  tipo: TITULO_PROPIEDAD
+                - hash: sha256:efgh0987654321...
+                  nombre: plano_ubicacion_georef.pdf
+                  tipo: PLANO_UBICACION
+                - hash: sha256:ijkl5678901234...
+                  nombre: resolucion_directoral.pdf
+                  tipo: RESOLUCION_DIRECTORAL
+              funcionarioResponsable: ''
+              observaciones: Envío automático desde sistema COFOPRI - Proceso BDD
+              oficinaRegistral: ''
+              prioridadTramite: NORMAL
+              tipoInscripcion: ''
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: titulo_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/titulos/{titulo_id}/estado:
+    get:
+      summary: 'SCENARIO: Consultar estado de inscripción en SUNARP'
+      description: >-
+        **WHEN**: Envío GET /api/titulos/{id}/estado para consultar estado en
+        SUNARP
+
+
+        **Comportamiento esperado:**
+
+        - Estado HTTP 200 OK
+
+        - Estado SUNARP válido proporcionado
+
+        - Detalles de transacción incluidos
+
+        - Historial de procesamiento
+
+        - Información específica según estado actual
+      operationId: scenarioConsultarEstadoDeInscripciNEnSunarp
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: titulo_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/titulos/{titulo_incompleto_id}/sunarp:
+    post:
+      summary: 'SCENARIO: Rechazar envío a SUNARP por documentos faltantes'
+      description: |-
+        **WHEN**: Envío POST /api/titulos/{id}/sunarp sin documentos requeridos
+
+        **Comportamiento esperado:**
+        - Estado HTTP 400 Bad Request
+        - Mensaje de error sobre documentos faltantes
+        - Lista de documentos requeridos
+        - Detalles de error de validación
+      operationId: scenarioRechazarEnvOASunarpPorDocumentosFaltantes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentosAdjuntos:
+                  type: array
+                  items: {}
+                  example: []
+                funcionarioResponsable:
+                  type: string
+                  example: Test User
+                observaciones:
+                  type: string
+                  example: Título sin documentos - test de validación
+                oficinaRegistral:
+                  type: string
+                  example: ZONA_REGISTRAL_IX_LIMA
+                tipoInscripcion:
+                  type: string
+                  example: PRIMERA_INSCRIPCION_DOMINIO
+            example:
+              documentosAdjuntos: []
+              funcionarioResponsable: Test User
+              observaciones: Título sin documentos - test de validación
+              oficinaRegistral: ZONA_REGISTRAL_IX_LIMA
+              tipoInscripcion: PRIMERA_INSCRIPCION_DOMINIO
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: titulo_incompleto_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/titulos/{titulo_id}:
+    put:
+      summary: 'SCENARIO: Actualizar estado título tras inscripción exitosa'
+      description: |-
+        **WHEN**: Envío PUT /api/titulos/{id} con datos de inscripción SUNARP
+
+        **Comportamiento esperado:**
+        - Estado HTTP 200 OK
+        - Estado actualizado a 'INSCRITO'
+        - Número de partida registral registrado
+        - Fecha de inscripción registrada
+        - Datos completos de integración SUNARP
+        - Título marcado como listo para entrega
+      operationId: scenarioActualizarEstadoTTuloTrasInscripciNExitosa
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documentosGenerados:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      fechaExpedicion:
+                        type: string
+                        example: ''
+                      numero:
+                        type: string
+                        example: TEST-2024-001234
+                      tipo:
+                        type: string
+                        example: TESTIMONIO_INSCRIPCION
+                  example:
+                    - fechaExpedicion: ''
+                      numero: TEST-2024-001234
+                      tipo: TESTIMONIO_INSCRIPCION
+                estadoSunarp:
+                  type: string
+                  example: INSCRITO
+                fechaInscripcion:
+                  type: string
+                  example: ''
+                funcionarioSunarp:
+                  type: string
+                  example: ''
+                numeroPartidaRegistral:
+                  type: string
+                  example: ''
+                observacionesInscripcion:
+                  type: string
+                  example: Inscripción realizada sin observaciones
+            example:
+              documentosGenerados:
+                - fechaExpedicion: ''
+                  numero: TEST-2024-001234
+                  tipo: TESTIMONIO_INSCRIPCION
+              estadoSunarp: INSCRITO
+              fechaInscripcion: ''
+              funcionarioSunarp: ''
+              numeroPartidaRegistral: ''
+              observacionesInscripcion: Inscripción realizada sin observaciones
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: titulo_id
+        in: path
+        required: true
+        schema:
+          type: string
+tags: []

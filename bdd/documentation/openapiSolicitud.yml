@@ -1,0 +1,202 @@
+openapi: 3.0.3
+info:
+  title: 'COFOPRI - FEATURE: Gestión de Solicitudes'
+  description: >-
+    Feature: Como ciudadano peruano quiero gestionar mis solicitudes de
+    titulación para obtener seguridad jurídica sobre mi propiedad
+
+
+    Esta colección implementa pruebas BDD (Behavior-Driven Development)
+    siguiendo el patrón Given-When-Then para todos los escenarios de la gestión
+    de solicitudes de titulación de predios urbanos.
+  version: 1.0.0
+  contact: {}
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /api/solicitudes:
+    get:
+      summary: 'SCENARIO: Listar solicitudes con filtros'
+      description: |-
+        **WHEN**: Envío GET /api/solicitudes con parámetros de filtrado
+
+        **Comportamiento esperado:**
+        - Estado HTTP 200 OK
+        - Respuesta paginada
+        - Todas las solicitudes coinciden con filtros
+        - Tamaño de página respetado
+      operationId: scenarioListarSolicitudesConFiltros
+      parameters:
+        - name: estado
+          in: query
+          schema:
+            type: string
+            example: ''
+        - name: page
+          in: query
+          schema:
+            type: string
+            example: ''
+        - name: size
+          in: query
+          schema:
+            type: string
+            example: ''
+      responses:
+        '200':
+          description: ''
+    post:
+      summary: 'SCENARIO: Rechazar solicitud con DNI inválido'
+      description: |-
+        **WHEN**: Envío POST /api/solicitudes con DNI en formato inválido
+
+        **Comportamiento esperado:**
+        - Estado HTTP 400 Bad Request
+        - Mensaje de error descriptivo sobre formato DNI
+        - No se crea la solicitud
+      operationId: scenarioRechazarSolicitudConDniInvLido
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ciudadano:
+                  type: object
+                  properties:
+                    apellidos:
+                      type: string
+                      example: García Rodríguez
+                    dni:
+                      type: string
+                      example: ''
+                    email:
+                      type: string
+                      example: maria.garcia@email.com
+                    nombres:
+                      type: string
+                      example: ''
+                    telefono:
+                      type: string
+                      example: '987654321'
+                predio:
+                  type: object
+                  properties:
+                    area:
+                      type: number
+                      example: 95
+                    departamento:
+                      type: string
+                      example: LIMA
+                    direccion:
+                      type: string
+                      example: ''
+                    distrito:
+                      type: string
+                      example: VILLA EL SALVADOR
+                    provincia:
+                      type: string
+                      example: LIMA
+            example:
+              ciudadano:
+                apellidos: García Rodríguez
+                dni: ''
+                email: maria.garcia@email.com
+                nombres: ''
+                telefono: '987654321'
+              predio:
+                area: 95
+                departamento: LIMA
+                direccion: ''
+                distrito: VILLA EL SALVADOR
+                provincia: LIMA
+      responses:
+        '200':
+          description: ''
+  /api/solicitudes/{solicitud_id}:
+    get:
+      summary: 'SCENARIO: Consultar solicitud existente'
+      description: |-
+        **WHEN**: Envío GET /api/solicitudes/{id} para una solicitud existente
+
+        **Comportamiento esperado:**
+        - Estado HTTP 200 OK
+        - Todos los datos de la solicitud
+        - ID coincide con el solicitado
+        - Estado es válido según reglas de negocio
+      operationId: scenarioConsultarSolicitudExistente
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: solicitud_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/solicitudes/{solicitud_id_inexistente}:
+    get:
+      summary: 'SCENARIO: Consultar solicitud inexistente'
+      description: >-
+        **WHEN**: Envío GET /api/solicitudes/{id} para una solicitud que no
+        existe
+
+
+        **Comportamiento esperado:**
+
+        - Estado HTTP 404 Not Found
+
+        - Mensaje de error apropiado
+
+        - Estructura de error estándar
+      operationId: scenarioConsultarSolicitudInexistente
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: solicitud_id_inexistente
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/solicitudes/{solicitud_id}/estado:
+    put:
+      summary: 'SCENARIO: Cambiar estado de solicitud'
+      description: |-
+        **WHEN**: Envío PUT /api/solicitudes/{id}/estado con nuevo estado válido
+
+        **Comportamiento esperado:**
+        - Estado HTTP 200 OK
+        - Estado actualizado correctamente
+        - Timestamp de actualización
+        - Historial de estados registrado
+      operationId: scenarioCambiarEstadoDeSolicitud
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comentario:
+                  type: string
+                  example: ''
+                nuevoEstado:
+                  type: string
+                  example: ''
+                usuarioResponsable:
+                  type: string
+                  example: EVALUADOR_TECNICO_01
+            example:
+              comentario: ''
+              nuevoEstado: ''
+              usuarioResponsable: EVALUADOR_TECNICO_01
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: solicitud_id
+        in: path
+        required: true
+        schema:
+          type: string
+tags: []
