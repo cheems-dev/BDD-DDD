@@ -1,0 +1,199 @@
+openapi: 3.0.3
+info:
+  title: 'COFOPRI - FEATURE: Gestión de Predios'
+  description: >-
+    Feature: Como técnico de catastro necesito gestionar predios para realizar
+    inspección y georreferenciación de propiedades
+
+
+    Esta colección implementa pruebas BDD (Behavior-Driven Development)
+    siguiendo el patrón Given-When-Then para todos los escenarios de gestión
+    catastral de predios urbanos.
+  version: 1.0.0
+  contact: {}
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /api/predios:
+    post:
+      summary: 'SCENARIO: Rechazar predio con área insuficiente'
+      description: |-
+        **WHEN**: Envío POST /api/predios con área menor a 60 m²
+
+        **Comportamiento esperado:**
+        - Estado HTTP 400 Bad Request
+        - Mensaje de error sobre área mínima
+        - No se crea el predio
+      operationId: scenarioRechazarPredioConReaInsuficiente
+      requestBody:
+        content:
+          text/plain:
+            example: |-
+              {
+                "direccion": "",
+                "area": ,
+                "departamento": "LIMA",
+                "provincia": "LIMA",
+                "distrito": "MIRAFLORES",
+                "usoSuelo": "VIVIENDA",
+                "zonaCatastral": "ZONA_B_RESIDENCIAL"
+              }
+      responses:
+        '200':
+          description: ''
+  /api/predios/{predio_id}/georreferenciar:
+    post:
+      summary: 'SCENARIO: Rechazar georreferenciación con coordenadas inválidas'
+      description: >-
+        **WHEN**: Envío POST /api/predios/{id}/georreferenciar con coordenadas
+        fuera de Perú
+
+
+        **Comportamiento esperado:**
+
+        - Estado HTTP 400 Bad Request
+
+        - Mensaje de error sobre coordenadas válidas
+
+        - No se actualiza la georreferenciación
+      operationId: scenarioRechazarGeorreferenciaciNConCoordenadasInvLidas
+      requestBody:
+        content:
+          text/plain:
+            example: |-
+              {
+                "coordenadas": {
+                  "utmX": ,
+                  "utmY": ,
+                  "zona": "",
+                  "datum": "WGS84"
+                },
+                "metodologia": "GPS_NAVEGADOR",
+                "precision": "MEDIA"
+              }
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: predio_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/predios/coordenadas:
+    get:
+      summary: 'SCENARIO: Buscar predios por coordenadas'
+      description: >-
+        **WHEN**: Envío GET /api/predios/coordenadas con parámetros de búsqueda
+        geoespacial
+
+
+        **Comportamiento esperado:**
+
+        - Estado HTTP 200 OK
+
+        - Lista de predios georreferenciados
+
+        - Todos los resultados dentro del radio especificado
+
+        - Información de distancia incluida
+
+        - Metadatos de búsqueda
+      operationId: scenarioBuscarPrediosPorCoordenadas
+      parameters:
+        - name: utmX
+          in: query
+          schema:
+            type: string
+            example: ''
+        - name: utmY
+          in: query
+          schema:
+            type: string
+            example: ''
+        - name: radioMetros
+          in: query
+          schema:
+            type: string
+            example: ''
+        - name: zona
+          in: query
+          schema:
+            type: string
+            example: 18S
+      responses:
+        '200':
+          description: ''
+  /api/predios/{predio_id}/planos:
+    post:
+      summary: 'SCENARIO: Generar planos de predio georreferenciado'
+      description: >-
+        **WHEN**: Envío POST /api/predios/{id}/planos para generar planos
+        catastrales
+
+
+        **Comportamiento esperado:**
+
+        - Estado HTTP 200 OK
+
+        - Tarea de generación creada
+
+        - Especificaciones del plano confirmadas
+
+        - Tiempo estimado de finalización
+
+        - URL para consultar estado
+      operationId: scenarioGenerarPlanosDePredioGeorreferenciado
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                escala:
+                  type: string
+                  example: ''
+                formatoSalida:
+                  type: string
+                  example: ''
+                incluirColindancias:
+                  type: boolean
+                  example: true
+                incluirCurvasNivel:
+                  type: boolean
+                  example: false
+                incluirServicios:
+                  type: boolean
+                  example: true
+                incluirVias:
+                  type: boolean
+                  example: true
+                observaciones:
+                  type: string
+                  example: Plano requerido para proceso de titulación
+                solicitadoPor:
+                  type: string
+                  example: TECNICO_CATASTRO_01
+                tipoPlano:
+                  type: string
+                  example: ''
+            example:
+              escala: ''
+              formatoSalida: ''
+              incluirColindancias: true
+              incluirCurvasNivel: false
+              incluirServicios: true
+              incluirVias: true
+              observaciones: Plano requerido para proceso de titulación
+              solicitadoPor: TECNICO_CATASTRO_01
+              tipoPlano: ''
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: predio_id
+        in: path
+        required: true
+        schema:
+          type: string
+tags: []

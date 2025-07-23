@@ -1,0 +1,207 @@
+openapi: 3.0.3
+info:
+  title: 'COFOPRI - FEATURE: Gestión de Ciudadanos'
+  description: >-
+    Feature: Como sistema necesito gestionar datos de ciudadanos para verificar
+    su identidad y registrar información personal
+
+
+    Esta colección implementa pruebas BDD (Behavior-Driven Development)
+    siguiendo el patrón Given-When-Then para todos los escenarios de gestión de
+    ciudadanos del sistema COFOPRI.
+  version: 1.0.0
+  contact: {}
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /api/ciudadanos:
+    post:
+      summary: 'SCENARIO: Rechazar ciudadano con DNI duplicado'
+      description: |-
+        **WHEN**: Envío POST /api/ciudadanos con DNI ya existente
+
+        **Comportamiento esperado:**
+        - Estado HTTP 409 Conflict
+        - Mensaje de error sobre DNI duplicado
+        - No se crea el ciudadano
+      operationId: scenarioRechazarCiudadanoConDniDuplicado
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                apellidos:
+                  type: string
+                  example: ''
+                direccion:
+                  type: string
+                  example: Jr. Los Pinos 789, Lima
+                dni:
+                  type: string
+                  example: ''
+                email:
+                  type: string
+                  example: carlos.mendoza@email.com
+                estadoCivil:
+                  type: string
+                  example: CASADO
+                fechaNacimiento:
+                  type: string
+                  example: '1990-07-20'
+                nombres:
+                  type: string
+                  example: ''
+                ocupacion:
+                  type: string
+                  example: COMERCIANTE
+                telefono:
+                  type: string
+                  example: '987111222'
+            example:
+              apellidos: ''
+              direccion: Jr. Los Pinos 789, Lima
+              dni: ''
+              email: carlos.mendoza@email.com
+              estadoCivil: CASADO
+              fechaNacimiento: '1990-07-20'
+              nombres: ''
+              ocupacion: COMERCIANTE
+              telefono: '987111222'
+      responses:
+        '200':
+          description: ''
+  /api/ciudadanos/dni/{ciudadano_dni}:
+    get:
+      summary: 'SCENARIO: Buscar ciudadano por DNI existente'
+      description: |-
+        **WHEN**: Envío GET /api/ciudadanos/dni/{dni} para DNI existente
+
+        **Comportamiento esperado:**
+        - Estado HTTP 200 OK
+        - Ciudadano encontrado con DNI correcto
+        - Datos completos del ciudadano
+        - Formato DNI válido
+      operationId: scenarioBuscarCiudadanoPorDniExistente
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: ciudadano_dni
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/ciudadanos/dni/{dni_inexistente}:
+    get:
+      summary: 'SCENARIO: Buscar ciudadano por DNI inexistente'
+      description: |-
+        **WHEN**: Envío GET /api/ciudadanos/dni/{dni} para DNI inexistente
+
+        **Comportamiento esperado:**
+        - Estado HTTP 404 Not Found
+        - Mensaje de error apropiado
+        - Estructura de error estándar
+      operationId: scenarioBuscarCiudadanoPorDniInexistente
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: dni_inexistente
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/ciudadanos/{ciudadano_id}/verificar:
+    post:
+      summary: 'SCENARIO: Verificar identidad ciudadano en RENIEC'
+      description: >-
+        **WHEN**: Envío POST /api/ciudadanos/{id}/verificar para verificar
+        identidad
+
+
+        **Comportamiento esperado:**
+
+        - Estado HTTP 200 OK
+
+        - Verificación RENIEC realizada
+
+        - Timestamp de verificación
+
+        - Datos RENIEC incluidos
+
+        - Estado de verificación actualizado
+      operationId: scenarioVerificarIdentidadCiudadanoEnReniec
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                forzarActualizacion:
+                  type: boolean
+                  example: true
+                validarCoherenciaDatos:
+                  type: boolean
+                  example: true
+            example:
+              forzarActualizacion: true
+              validarCoherenciaDatos: true
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: ciudadano_id
+        in: path
+        required: true
+        schema:
+          type: string
+  /api/ciudadanos/{ciudadano_id}:
+    put:
+      summary: 'SCENARIO: Actualizar datos de ciudadano'
+      description: |-
+        **WHEN**: Envío PUT /api/ciudadanos/{id} con datos actualizados
+
+        **Comportamiento esperado:**
+        - Estado HTTP 200 OK
+        - Campos actualizados correctamente
+        - DNI permanece inmutable
+        - Timestamp de actualización presente
+      operationId: scenarioActualizarDatosDeCiudadano
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                direccion:
+                  type: string
+                  example: ''
+                email:
+                  type: string
+                  example: ''
+                estadoCivil:
+                  type: string
+                  example: CASADO
+                ocupacion:
+                  type: string
+                  example: PROFESIONAL
+                telefono:
+                  type: string
+                  example: ''
+            example:
+              direccion: ''
+              email: ''
+              estadoCivil: CASADO
+              ocupacion: PROFESIONAL
+              telefono: ''
+      responses:
+        '200':
+          description: ''
+    parameters:
+      - name: ciudadano_id
+        in: path
+        required: true
+        schema:
+          type: string
+tags: []
